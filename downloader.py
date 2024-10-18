@@ -6,7 +6,7 @@ from PIL import Image
 from io import BytesIO
 import os
 
-def download_audio_and_metadata(youtube_url):
+def download_audio_and_metadata(youtube_url, track_number=None):
     # Set options for yt-dlp
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -57,7 +57,7 @@ def download_audio_and_metadata(youtube_url):
             thumbnail_file = None  # No thumbnail URL available
         
         # Automatically add metadata
-        add_metadata(audio_file, title, artist, album, album_artist, release_year, "", thumbnail_file)
+        add_metadata(audio_file, title, artist, album, album_artist, release_year, "", thumbnail_file, track_number)
 
         # Return audio file path, thumbnail file path, and extracted metadata
         return audio_file, thumbnail_file, title, artist, album, album_artist, release_year, ""
@@ -74,7 +74,7 @@ def crop_image_to_square(image):
     # Crop the image to a square
     return image.crop((left, top, right, bottom))
 
-def add_metadata(audio_file, title, artist, album, album_artist, release_year, genre, thumbnail_file):
+def add_metadata(audio_file, title, artist, album, album_artist, release_year, genre, thumbnail_file, track_number):
     # Add metadata using mutagen
     audio = EasyID3(audio_file)
     audio['title'] = title
@@ -84,6 +84,11 @@ def add_metadata(audio_file, title, artist, album, album_artist, release_year, g
     audio['date'] = release_year
     if genre:
         audio['genre'] = genre
+    
+    # Add track number if provided
+    if track_number is not None:
+        audio['tracknumber'] = str(track_number)
+    
     audio.save()
 
     # Attach thumbnail as album art using ID3
@@ -100,3 +105,14 @@ def add_metadata(audio_file, title, artist, album, album_artist, release_year, g
             audio_tags.save()
 
     return audio_file  # Return the updated file with metadata and thumbnail
+
+def process_playlist(playlist_url):
+    # Extract video URLs from the playlist
+    ydl_opts = {'extract_flat': True}
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        playlist_info = ydl.extract_info(playlist_url, download=False)
+        video_urls = [entry['url'] for entry in playlist_info['entries']]
+    
+    # Download each video and modify metadata
+    for track_number, video_url in enumerate(video_urls, start=1):
+        download_audio_and_metadata(video_url, track_number)
