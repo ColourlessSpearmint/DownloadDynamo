@@ -5,6 +5,7 @@ import requests
 from PIL import Image
 from io import BytesIO
 import os
+import zipfile
 
 def download_audio_and_metadata(youtube_url, track_number=None):
     # Set options for yt-dlp
@@ -113,6 +114,22 @@ def process_playlist(playlist_url):
         playlist_info = ydl.extract_info(playlist_url, download=False)
         video_urls = [entry['url'] for entry in playlist_info['entries']]
     
+    # Store audio files for zipping
+    audio_files = []
+    
     # Download each video and modify metadata
     for track_number, video_url in enumerate(video_urls, start=1):
-        download_audio_and_metadata(video_url, track_number)
+        audio_file, thumbnail_file, _, _, _, _, _, _ = download_audio_and_metadata(video_url, track_number)
+        audio_files.append(audio_file)
+        if thumbnail_file and os.path.exists(thumbnail_file):
+            os.remove(thumbnail_file)  # Remove thumbnail after processing to clean up
+
+    # Zip the audio files
+    zip_filename = "playlist.zip"
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        for audio_file in audio_files:
+            zipf.write(audio_file, os.path.basename(audio_file))  # Add the file to the zip
+
+    print(f"Zipped {len(audio_files)} audio files into {zip_filename}")
+
+    return(zip_filename)
