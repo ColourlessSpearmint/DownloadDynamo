@@ -1,5 +1,5 @@
 import gradio as gr
-from downloader import download_audio_and_metadata, add_metadata
+from downloader import download_audio_and_metadata, add_metadata, process_playlist
 
 # Gradio interface
 with gr.Blocks() as interface:
@@ -40,10 +40,10 @@ with gr.Blocks() as interface:
         # Second Tab: Input text and output zip file
         with gr.Tab("Download Playlist"):
             youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube link here")
-            process_btn = gr.Button("Download Playlist")
+            playlist_btn = gr.Button("Download Playlist")
             zip_output = gr.File(label="Playlist", type="filepath")
 
-            process_btn.click(lambda x: "playlist.zip", inputs=youtube_url, outputs=zip_output)
+            playlist_btn.click(process_playlist, inputs=youtube_url, outputs=zip_output)
 
 # Launch the interface
 interface.launch(inbrowser=True)
