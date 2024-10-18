@@ -75,7 +75,6 @@ def crop_image_to_square(image):
     return image.crop((left, top, right, bottom))
 
 def add_metadata(audio_file, title, artist, album, album_artist, release_year, genre, thumbnail_file):
-    print(thumbnail_file)
     # Add metadata using mutagen
     audio = EasyID3(audio_file)
     audio['title'] = title
