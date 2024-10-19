@@ -5,3 +5,4 @@
 __pycache__/
 .vscode/
 downloads/
+.pytest_cache/
