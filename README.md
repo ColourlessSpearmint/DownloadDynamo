@@ -21,12 +21,6 @@ To use DownloadDynamo, ensure the following dependencies are installed:
 - `Pillow` for image processing
 - `requests` for downloading thumbnails
 
-Install the dependencies using pip:
-
-```bash
-pip install gradio yt-dlp mutagen Pillow requests
-```
-
 ## How to Use
 
 1. **Clone the Repository**:
@@ -36,13 +30,19 @@ pip install gradio yt-dlp mutagen Pillow requests
     cd DownloadDynamo
     ```
 
-2. **Run the Script**:
+1. **Install Packages**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. **Run the Script**:
 
     ```bash
     python app.py
     ```
 
-3. **Access the Interface**:
+4. **Access the Interface**:
 
    The script will launch a Gradio web interface in your browser where you can:
 
