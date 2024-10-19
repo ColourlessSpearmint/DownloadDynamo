@@ -3,6 +3,13 @@ import os
 import requests
 from PIL import Image
 from io import BytesIO
+import re
+
+def sanitize_title(title):
+    # Remove punctuation, emojis, and similar characters
+    sanitized = re.sub(r'[^\w\s]', '', title)  # Keep only alphanumeric characters and spaces
+    sanitized = sanitized.strip()  # Remove leading/trailing spaces
+    return sanitized
 
 def get_video_info(search_query, num_results=5, output_folder='downloads'):
     # Ensure the output folder exists
@@ -32,7 +39,8 @@ def get_video_info(search_query, num_results=5, output_folder='downloads'):
         }
 
         # Download audio
-        audio_output = os.path.join(output_folder, f"{video_info['title']}.mp3")
+        sanitized_title = sanitize_title(video_info['title'])  # Sanitize the title
+        audio_output = os.path.join(output_folder, f"{sanitized_title}.mp3")
         audio_opts = {
             'format': 'bestaudio/best',
             'outtmpl': audio_output,
@@ -61,8 +69,8 @@ def search_videos(keyword):
         urls.append(video['url'])
 
         response = requests.get(video['thumbnail_output'])
-        safe_title = "".join(c for c in video['title'] if c.isalnum() or c in (" ", ".", "_")).rstrip()  # Sanitize title
-        thumbnail_file = (safe_title) + ".jpg"
+        sanitized_title = sanitize_title(video['title'])  # Sanitize title for thumbnail filename
+        thumbnail_file = f"{sanitized_title}.jpg"
 
         if response.status_code == 200:
             img = Image.open(BytesIO(response.content))
