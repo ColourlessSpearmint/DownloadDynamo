@@ -9,7 +9,8 @@ Developed by **Ethan Marks** ([@ColourlessSpearmint](https://github.com/Colourle
 ## Features
 - **YouTube Audio Download**: Download audio from YouTube as MP3 using `yt-dlp`.
 - **Automatic Playlist Iteration**: Download an entire playlist with one command.
-- **Keyword Search**: Search YouTube's database without leaving the interface. 
+- **Keyword Search**: Search YouTube's database without leaving the interface.
+- **MP4 Support**: Save files as .mp4.
 - **Automatic Metadata Extraction**: Extract metadata like title, artist, and release year from YouTube videos.
 - **Thumbnail Download**: Download the video thumbnail and use it as album art.
 - **Editable Metadata**: Manually adjust metadata fields such as title, album, artist, and genre.
@@ -55,10 +56,6 @@ To use DownloadDynamo, ensure the following dependencies are installed:
    - Click "Extract Audio and Metadata" to download the audio and automatically fill the metadata fields.
    - Optionally edit metadata fields.
    - Click "Add Metadata and Download" to finalize the MP3 with updated metadata and album art.
-
-## Upcoming Features
-
-- MP4 support
 
 ## License
 
