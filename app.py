@@ -5,7 +5,11 @@ from search import search_videos  # Import the search function
 # Gradio interface
 with gr.Blocks() as interface:
     # Create a tabbed interface
-    gr.Markdown("# DownloadDynamo")
+    gr.Markdown("""
+                <img src="https://raw.githubusercontent.com/ColourlessSpearmint/DownloadDynamo/refs/heads/main/images/icon/icon-256.png" alt="icon" width="192"/>
+                <h1>DownloadDynamo
+                <h3>By Ethan Marks
+                """)
     with gr.Tabs():
         # First Tab: Download Single
         with gr.Tab("Download Single"):
@@ -101,4 +105,4 @@ with gr.Blocks() as interface:
             pipeline_btn.click(video_pipeline, inputs=youtube_url_pipeline, outputs=video_output)
 
 # Launch the interface
-interface.launch(inbrowser=True)
+interface.launch(inbrowser=True, favicon_path="images\icon\icon-64.png")
