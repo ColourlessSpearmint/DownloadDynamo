@@ -51,22 +51,26 @@ with gr.Blocks() as interface:
             search_keyword = gr.Textbox(label="Search Keyword", placeholder="Enter keyword to search")
             search_btn = gr.Button("Search Videos")
             
-            # Display outputs for the top 5 videos
+            # Display outputs for the top 3 videos
             with gr.Row():
-                titles_output = gr.Label(label="Titles")
-                artists_output = gr.Label(label="Artists")
-                release_years_output = gr.Label(label="Release Years")
+                titles_output = [gr.Textbox(label=f"Title {i+1}") for i in range(3)]
+                artists_output = [gr.Textbox(label=f"Artist {i+1}") for i in range(3)]
+                release_years_output = [gr.Textbox(label=f"Release Year {i+1}") for i in range(3)]
 
             # Audio and thumbnails for each video
             with gr.Row():
-                audio_output_search = gr.Audio(label="Audio Outputs", type="filepath", show_download_button=True)
-                thumbnails_output = gr.Image(label="Thumbnails", type="filepath")
+                audio_output_search = [gr.Audio(label=f"Audio {i+1}", type="filepath", show_download_button=True) for i in range(3)]
+                thumbnails_output = [gr.Image(label=f"Thumbnail {i+1}", type="filepath") for i in range(3)]
 
             # Search functionality
+            def update_outputs(keyword):
+                titles, artists, years, audios, thumbnails = search_videos(keyword)
+                return (*titles, *artists, *years, *audios, *thumbnails)
+
             search_btn.click(
-                search_videos, 
+                update_outputs, 
                 inputs=search_keyword, 
-                outputs=[titles_output, artists_output, release_years_output, audio_output_search, thumbnails_output]
+                outputs=[*titles_output, *artists_output, *release_years_output, *audio_output_search, *thumbnails_output]
             )
 
 # Launch the interface
