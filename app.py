@@ -51,16 +51,25 @@ with gr.Blocks() as interface:
             search_keyword = gr.Textbox(label="Search Keyword", placeholder="Enter keyword to search")
             search_btn = gr.Button("Search Videos")
             
-            # Display outputs for the top 3 videos
-            with gr.Row():
-                titles_output = [gr.Textbox(label=f"Title {i+1}") for i in range(3)]
-                artists_output = [gr.Textbox(label=f"Artist {i+1}") for i in range(3)]
-                release_years_output = [gr.Textbox(label=f"Release Year {i+1}") for i in range(3)]
+            # Display outputs for the top 3 videos, each in its own row
+            def create_video_row(index):
+                with gr.Row():
+                    # Create a row for each video
+                    title_output = gr.Textbox(label=f"Title {index + 1}")
+                    artist_output = gr.Textbox(label=f"Artist {index + 1}")
+                    release_year_output = gr.Textbox(label=f"Release Year {index + 1}")
+                    audio_output = gr.Audio(label=f"Audio {index + 1}", type="filepath", show_download_button=True)
+                    thumbnail_output = gr.Image(label=f"Thumbnail {index + 1}", type="filepath")
+                    
+                    return title_output, artist_output, release_year_output, audio_output, thumbnail_output
 
-            # Audio and thumbnails for each video
-            with gr.Row():
-                audio_output_search = [gr.Audio(label=f"Audio {i+1}", type="filepath", show_download_button=True) for i in range(3)]
-                thumbnails_output = [gr.Image(label=f"Thumbnail {i+1}", type="filepath") for i in range(3)]
+            # Create placeholders for video outputs
+            video_outputs = [create_video_row(i) for i in range(3)]
+            titles_output = [output[0] for output in video_outputs]
+            artists_output = [output[1] for output in video_outputs]
+            release_years_output = [output[2] for output in video_outputs]
+            audio_output_search = [output[3] for output in video_outputs]
+            thumbnails_output = [output[4] for output in video_outputs]
 
             # Search functionality
             def update_outputs(keyword):
