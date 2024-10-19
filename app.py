@@ -5,9 +5,11 @@ from search import search_videos  # Import the search function
 # Gradio interface
 with gr.Blocks() as interface:
     # Create a tabbed interface
+    gr.Markdown("# DownloadDynamo")
     with gr.Tabs():
         # First Tab: Download Single
         with gr.Tab("Download Single"):
+            gr.Markdown("This tab downloads the audio of a single video. Upon completion, it will fill out the metadata fields. You can manually edit the fields; press `Apply Metadata` to attach the new metadata to the audio file.")
             youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube link here")
             extract_btn = gr.Button("Extract Audio and Metadata")
             
@@ -26,7 +28,7 @@ with gr.Blocks() as interface:
                 release_year = gr.Textbox(label="Release Year", placeholder="Enter release year")
                 genre = gr.Textbox(label="Genre", placeholder="Enter genre (optional)")
                 
-            add_metadata_btn = gr.Button("Add Metadata and Download")
+            add_metadata_btn = gr.Button("Apply Metadata")
             
             # Audio extraction functionality with metadata pre-filling
             extract_btn.click(download_audio_and_metadata, 
@@ -40,14 +42,16 @@ with gr.Blocks() as interface:
 
         # Second Tab: Download Playlist
         with gr.Tab("Download Playlist"):
-            youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube link here")
+            gr.Markdown("This tab will iterate through every video in a playlist, downloading the audio, attaching the metadata, and compressing to a .zip file. This tab does not include metadata preview or editing.")
+            youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube playlist link here")
             playlist_btn = gr.Button("Download Playlist")
             zip_output = gr.File(label="Playlist", type="filepath")
-
+            
             playlist_btn.click(process_playlist, inputs=youtube_url, outputs=zip_output)
 
         # Third Tab: Search by Keyword
         with gr.Tab("Search Videos"):
+            gr.Markdown("This tab will search YouTube's database and display the top three results. It will download the audio, but will not attach metadata. Copy the url and paste it into another tab for a more feature-rich download")
             search_keyword = gr.Textbox(label="Search Keyword", placeholder="Enter keyword to search")
             search_btn = gr.Button("Search Videos")
             
@@ -55,9 +59,9 @@ with gr.Blocks() as interface:
             def create_video_row(index):
                 with gr.Row():
                     # Create a row for each video
-                    title_output = gr.Textbox(label=f"Title {index + 1}")
-                    artist_output = gr.Textbox(label=f"Artist {index + 1}")
-                    release_year_output = gr.Textbox(label=f"Release Year {index + 1}")
+                    title_output = gr.Textbox(label=f"Title {index + 1}", interactive=False)  # Make non-interactive
+                    artist_output = gr.Textbox(label=f"Artist {index + 1}", interactive=False)  # Make non-interactive
+                    release_year_output = gr.Textbox(label=f"Release Year {index + 1}", interactive=False)  # Make non-interactive
                     audio_output = gr.Audio(label=f"Audio {index + 1}", type="filepath", show_download_button=True)
                     thumbnail_output = gr.Image(label=f"Thumbnail {index + 1}", type="filepath")
                     url_output = gr.Textbox(label=f"URL {index + 1}", interactive=False)  # URL output, non-interactive
@@ -86,6 +90,7 @@ with gr.Blocks() as interface:
 
         # Fourth Tab: Video
         with gr.Tab("Download Video"):
+            gr.Markdown("This tab downloads the audio and video from a provided url. It does not attach metadata, nor does it include previews. It does have the ability to differenciate between videos and playlists.")
             youtube_url_pipeline = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube video or playlist link here")
             pipeline_btn = gr.Button("Process Video/Playlist")
             
@@ -94,7 +99,6 @@ with gr.Blocks() as interface:
             
             # Functionality for processing video or playlist
             pipeline_btn.click(video_pipeline, inputs=youtube_url_pipeline, outputs=video_output)
-
 
 # Launch the interface
 interface.launch(inbrowser=True)
