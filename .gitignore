@@ -1,5 +1,7 @@
 *.jpg
 *.mp3
 *.zip
+*.webm
 __pycache__/
 .vscode/
+downloads/

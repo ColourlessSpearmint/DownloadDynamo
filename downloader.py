@@ -7,6 +7,14 @@ from io import BytesIO
 import os
 import zipfile
 
+# Define the downloads directory
+DOWNLOADS_DIR = "downloads"
+
+def ensure_downloads_directory():
+    """Ensure the downloads directory exists."""
+    if not os.path.exists(DOWNLOADS_DIR):
+        os.makedirs(DOWNLOADS_DIR)
+
 def download_audio_and_metadata(youtube_url, track_number=None):
     """
     Downloads audio from a YouTube video and applies metadata including title, artist,
@@ -20,10 +28,13 @@ def download_audio_and_metadata(youtube_url, track_number=None):
         tuple: Contains the path to the downloaded audio file, thumbnail image (if available),
         the title, artist, album, album artist, release year, and genre (empty string by default).
     """
+    # Ensure downloads directory exists
+    ensure_downloads_directory()
+
     # Set options for yt-dlp
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': 'audio.%(ext)s',
+        'outtmpl': os.path.join(DOWNLOADS_DIR, 'audio.%(ext)s'),
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -38,12 +49,17 @@ def download_audio_and_metadata(youtube_url, track_number=None):
         # Extract metadata from YouTube video
         title = info_dict.get('title', 'Unknown Title')
         artist = info_dict.get('uploader', 'Unknown Artist')
+        if "music.youtube.com" in youtube_url:
+            artist = artist.replace(' - Topic', '')  # Remove ' - Topic' from artist
+
         album = title  # Set album to the title of the song by default
         album_artist = artist  # Default album artist to the uploader/artist
         
         # Rename the audio file to the title of the song
         safe_title = "".join(c for c in title if c.isalnum() or c in (" ", ".", "_")).rstrip()  # Sanitize title
-        new_audio_title = f"{safe_title}.mp3"
+        new_audio_title = os.path.join(DOWNLOADS_DIR, f"{safe_title}.mp3")
+        if os.path.exists(new_audio_title):  # Overwrite if file exists
+            os.remove(new_audio_title)
         os.rename(audio_file, new_audio_title)  # Rename the file
         audio_file = new_audio_title
 
@@ -55,7 +71,7 @@ def download_audio_and_metadata(youtube_url, track_number=None):
         thumbnail_url = info_dict.get('thumbnail', None)
         
         # Save thumbnail to thumbnail.jpg
-        thumbnail_file = 'thumbnail.jpg'  # Always use this filename
+        thumbnail_file = os.path.join(DOWNLOADS_DIR, 'thumbnail.jpg')  # Always use this filename
         
         if thumbnail_url:
             response = requests.get(thumbnail_url)
@@ -173,14 +189,14 @@ def process_playlist(playlist_url):
             os.remove(thumbnail_file)  # Remove thumbnail after processing to clean up
 
     # Zip the audio files
-    zip_filename = "playlist.zip"
+    zip_filename = os.path.join(DOWNLOADS_DIR, "playlist.zip")
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for audio_file in audio_files:
             zipf.write(audio_file, os.path.basename(audio_file))  # Add the file to the zip
 
     print(f"Zipped {len(audio_files)} audio files into {zip_filename}")
 
-    return(zip_filename)
+    return zip_filename
 
 def download_video(youtube_url):
     """
@@ -192,10 +208,13 @@ def download_video(youtube_url):
     Returns:
         str: The path to the downloaded mp4 video file.
     """
+    # Ensure downloads directory exists
+    ensure_downloads_directory()
+
     # Set options for yt-dlp to download video in mp4 format
     ydl_opts = {
         'format': 'bestvideo+bestaudio',
-        'outtmpl': 'video.%(ext)s',
+        'outtmpl': os.path.join(DOWNLOADS_DIR, 'video.%(ext)s'),
         'merge_output_format': 'mp4'
     }
 
@@ -206,7 +225,9 @@ def download_video(youtube_url):
         # Rename the video file to the title of the video
         title = info_dict.get('title', 'Unknown Title')
         safe_title = "".join(c for c in title if c.isalnum() or c in (" ", ".", "_")).rstrip()  # Sanitize title
-        new_video_title = f"{safe_title}.mp4"
+        new_video_title = os.path.join(DOWNLOADS_DIR, f"{safe_title}.mp4")
+        if os.path.exists(new_video_title):  # Overwrite if file exists
+            os.remove(new_video_title)
         os.rename(video_file, new_video_title)  # Rename the file
         video_file = new_video_title
 
@@ -238,7 +259,7 @@ def process_video_playlist(playlist_url):
         video_files.append(video_file)
 
     # Zip the video files
-    zip_filename = "videos_playlist.zip"
+    zip_filename = os.path.join(DOWNLOADS_DIR, "videos_playlist.zip")
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for video_file in video_files:
             zipf.write(video_file, os.path.basename(video_file))  # Add the file to the zip
