@@ -60,8 +60,9 @@ with gr.Blocks() as interface:
                     release_year_output = gr.Textbox(label=f"Release Year {index + 1}")
                     audio_output = gr.Audio(label=f"Audio {index + 1}", type="filepath", show_download_button=True)
                     thumbnail_output = gr.Image(label=f"Thumbnail {index + 1}", type="filepath")
+                    url_output = gr.Textbox(label=f"URL {index + 1}", interactive=False)  # URL output, non-interactive
                     
-                    return title_output, artist_output, release_year_output, audio_output, thumbnail_output
+                    return title_output, artist_output, release_year_output, audio_output, thumbnail_output, url_output
 
             # Create placeholders for video outputs
             video_outputs = [create_video_row(i) for i in range(3)]
@@ -70,16 +71,17 @@ with gr.Blocks() as interface:
             release_years_output = [output[2] for output in video_outputs]
             audio_output_search = [output[3] for output in video_outputs]
             thumbnails_output = [output[4] for output in video_outputs]
+            urls_output = [output[5] for output in video_outputs]  # URL outputs
 
             # Search functionality
             def update_outputs(keyword):
-                titles, artists, years, audios, thumbnails = search_videos(keyword)
-                return (*titles, *artists, *years, *audios, *thumbnails)
+                titles, artists, release_years, audio_paths, thumbnails, urls = search_videos(keyword)
+                return (*titles, *artists, *release_years, *audio_paths, *thumbnails, *urls)  # Return URLs as well
 
             search_btn.click(
                 update_outputs, 
                 inputs=search_keyword, 
-                outputs=[*titles_output, *artists_output, *release_years_output, *audio_output_search, *thumbnails_output]
+                outputs=[*titles_output, *artists_output, *release_years_output, *audio_output_search, *thumbnails_output, *urls_output]
             )
 
 # Launch the interface

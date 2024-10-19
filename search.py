@@ -28,6 +28,7 @@ def get_video_info(search_query, num_results=5, output_folder='downloads'):
             'artist': result.get('uploader', 'N/A'),
             'release_year': result.get('release_date', 'N/A')[:4] if result.get('release_date') else 'N/A',
             'thumbnail_output': result.get('thumbnail', 'N/A'),
+            'url': result.get('webpage_url', 'N/A')
         }
 
         # Download audio
@@ -47,26 +48,27 @@ def get_video_info(search_query, num_results=5, output_folder='downloads'):
     return video_data
 
 def search_videos(keyword):
-    # Get the top 5 video information
+    # Get the top 3 video information
     video_info = get_video_info(keyword, num_results=3)
     
     # Prepare data for Gradio output
-    titles, artists, release_years, audio_paths, thumbnails = [], [], [], [], []
+    titles, artists, release_years, audio_paths, thumbnails, urls = [], [], [], [], [], []
     for video in video_info:
         titles.append(video['title'])
         artists.append(video['artist'])
         release_years.append(video['release_year'])
         audio_paths.append(video['audio_output'])  # Path to the downloaded audio
+        urls.append(video['url'])
 
         response = requests.get(video['thumbnail_output'])
         safe_title = "".join(c for c in video['title'] if c.isalnum() or c in (" ", ".", "_")).rstrip()  # Sanitize title
-        thumbnail_file = (safe_title)+".jpg"
+        thumbnail_file = (safe_title) + ".jpg"
 
         if response.status_code == 200:
             img = Image.open(BytesIO(response.content))
             img.save(thumbnail_file)  # Save the image
         else:
             thumbnail_file = None  # In case of an unsuccessful response
-        thumbnails.append(thumbnail_file)  # Thumbnail Filepath
+        thumbnails.append(thumbnail_file)
     
-    return titles, artists, release_years, audio_paths, thumbnails
+    return titles, artists, release_years, audio_paths, thumbnails, urls
