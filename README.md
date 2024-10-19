@@ -62,3 +62,7 @@ To use DownloadDynamo, ensure the following dependencies are installed:
 ## License
 
 DownloadDynamo is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
+
+## Icon Attribution
+
+The [project icon](https://raw.githubusercontent.com/ColourlessSpearmint/DownloadDynamo/refs/heads/main/images/icon/icon-1024.png) was generated using [Stable Diffusion](https://stability.ai/). You are free to use the icon for your own projects, subject to the same [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) that covers this repository.
