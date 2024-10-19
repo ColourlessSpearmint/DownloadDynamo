@@ -8,6 +8,18 @@ import os
 import zipfile
 
 def download_audio_and_metadata(youtube_url, track_number=None):
+    """
+    Downloads audio from a YouTube video and applies metadata including title, artist,
+    album, and thumbnail as album art.
+
+    Args:
+        youtube_url (str): The URL of the YouTube video to download audio from.
+        track_number (int, optional): The track number for playlist downloads. Defaults to None.
+
+    Returns:
+        tuple: Contains the path to the downloaded audio file, thumbnail image (if available),
+        the title, artist, album, album artist, release year, and genre (empty string by default).
+    """
     # Set options for yt-dlp
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -64,6 +76,15 @@ def download_audio_and_metadata(youtube_url, track_number=None):
         return audio_file, thumbnail_file, title, artist, album, album_artist, release_year, ""
 
 def crop_image_to_square(image):
+    """
+    Crops the given image to a square, based on the smaller of the width or height.
+
+    Args:
+        image (PIL.Image.Image): The image to be cropped.
+
+    Returns:
+        PIL.Image.Image: The cropped square image.
+    """
     width, height = image.size
     min_side = min(width, height)
     
@@ -76,6 +97,23 @@ def crop_image_to_square(image):
     return image.crop((left, top, right, bottom))
 
 def add_metadata(audio_file, title, artist, album, album_artist, release_year, genre, thumbnail_file, track_number):
+    """
+    Adds metadata to an audio file, such as title, artist, album, and optionally attaches a thumbnail as album art.
+
+    Args:
+        audio_file (str): The path to the audio file to which metadata will be added.
+        title (str): The title of the audio track.
+        artist (str): The artist of the audio track.
+        album (str): The album name for the audio track.
+        album_artist (str): The album artist name.
+        release_year (str): The year of release.
+        genre (str): The genre of the audio track (optional).
+        thumbnail_file (str): The path to the thumbnail image (if available).
+        track_number (int, optional): The track number for playlist downloads. Defaults to None.
+
+    Returns:
+        str: The path to the audio file with metadata added.
+    """
     # Add metadata using mutagen
     audio = EasyID3(audio_file)
     audio['title'] = title
@@ -108,6 +146,16 @@ def add_metadata(audio_file, title, artist, album, album_artist, release_year, g
     return audio_file  # Return the updated file with metadata and thumbnail
 
 def process_playlist(playlist_url):
+    """
+    Processes a YouTube playlist by downloading the audio for each video, applying metadata,
+    and zipping all the audio files.
+
+    Args:
+        playlist_url (str): The URL of the YouTube playlist to process.
+
+    Returns:
+        str: The path to the zip file containing the downloaded audio files.
+    """
     # Extract video URLs from the playlist
     ydl_opts = {'extract_flat': True}
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -135,6 +183,15 @@ def process_playlist(playlist_url):
     return(zip_filename)
 
 def download_video(youtube_url):
+    """
+    Downloads a video from YouTube in mp4 format.
+
+    Args:
+        youtube_url (str): The URL of the YouTube video to download.
+
+    Returns:
+        str: The path to the downloaded mp4 video file.
+    """
     # Set options for yt-dlp to download video in mp4 format
     ydl_opts = {
         'format': 'bestvideo+bestaudio',
@@ -157,6 +214,15 @@ def download_video(youtube_url):
         return video_file
 
 def process_video_playlist(playlist_url):
+    """
+    Processes a YouTube playlist by downloading the videos and zipping them into a single file.
+
+    Args:
+        playlist_url (str): The URL of the YouTube playlist to process.
+
+    Returns:
+        str: The path to the zip file containing the downloaded video files.
+    """
     # Extract video URLs from the playlist
     ydl_opts = {'extract_flat': True}
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
