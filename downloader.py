@@ -133,3 +133,50 @@ def process_playlist(playlist_url):
     print(f"Zipped {len(audio_files)} audio files into {zip_filename}")
 
     return(zip_filename)
+
+def download_video(youtube_url):
+    # Set options for yt-dlp to download video in mp4 format
+    ydl_opts = {
+        'format': 'bestvideo+bestaudio',
+        'outtmpl': 'video.%(ext)s',
+        'merge_output_format': 'mp4'
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(youtube_url, download=True)
+        video_file = ydl.prepare_filename(info_dict).replace('.mkv', '.mp4').replace('.webm', '.mp4')
+        
+        # Rename the video file to the title of the video
+        title = info_dict.get('title', 'Unknown Title')
+        safe_title = "".join(c for c in title if c.isalnum() or c in (" ", ".", "_")).rstrip()  # Sanitize title
+        new_video_title = f"{safe_title}.mp4"
+        os.rename(video_file, new_video_title)  # Rename the file
+        video_file = new_video_title
+
+        # Return the video file path
+        return video_file
+
+def process_video_playlist(playlist_url):
+    # Extract video URLs from the playlist
+    ydl_opts = {'extract_flat': True}
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        playlist_info = ydl.extract_info(playlist_url, download=False)
+        video_urls = [entry['url'] for entry in playlist_info['entries']]
+    
+    # Store video files for zipping
+    video_files = []
+    
+    # Download each video
+    for i, video_url in enumerate(video_urls, start=1):
+        video_file = download_video(video_url)
+        video_files.append(video_file)
+
+    # Zip the video files
+    zip_filename = "videos_playlist.zip"
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        for video_file in video_files:
+            zipf.write(video_file, os.path.basename(video_file))  # Add the file to the zip
+
+    print(f"Zipped {len(video_files)} videos into {zip_filename}")
+
+    return zip_filename
