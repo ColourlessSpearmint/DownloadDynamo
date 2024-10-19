@@ -4,6 +4,7 @@ DownloadDynamo is a Python tool that downloads audio from YouTube, extracts meta
 
 ## Features
 - **YouTube Audio Download**: Download audio from YouTube as MP3 using `yt-dlp`.
+- **Automatic Playlist Iteration** Download an entire playlist with one command.
 - **Automatic Metadata Extraction**: Extract metadata like title, artist, and release year from YouTube videos.
 - **Thumbnail Download**: Download the video thumbnail and use it as album art.
 - **Editable Metadata**: Manually adjust metadata fields such as title, album, artist, and genre.
@@ -60,7 +61,11 @@ pip install gradio yt-dlp mutagen Pillow requests
 ## Customization
 
 - **Metadata Fields**: Add or modify fields such as genre or album artist through the Gradio interface.
-- **Audio Formats**: By default, the tool downloads MP3 files, but you can customize the `yt-dlp` settings for other formats.
+
+## Upcoming Features
+
+- MP4 support
+- Keyword Search
 
 ## License
 
