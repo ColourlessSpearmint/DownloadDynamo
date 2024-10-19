@@ -1,5 +1,5 @@
 import gradio as gr
-from downloader import download_audio_and_metadata, add_metadata, process_playlist
+from downloader import download_audio_and_metadata, add_metadata, process_playlist, video_pipeline
 from search import search_videos  # Import the search function
 
 # Gradio interface
@@ -83,6 +83,18 @@ with gr.Blocks() as interface:
                 inputs=search_keyword, 
                 outputs=[*titles_output, *artists_output, *release_years_output, *audio_output_search, *thumbnails_output, *urls_output]
             )
+
+        # Fourth Tab: Video
+        with gr.Tab("Download Video"):
+            youtube_url_pipeline = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube video or playlist link here")
+            pipeline_btn = gr.Button("Process Video/Playlist")
+            
+            # Outputs for video or playlist zip
+            video_output = gr.File(label="Downloaded Video/Playlist", type="filepath")
+            
+            # Functionality for processing video or playlist
+            pipeline_btn.click(video_pipeline, inputs=youtube_url_pipeline, outputs=video_output)
+
 
 # Launch the interface
 interface.launch(inbrowser=True)

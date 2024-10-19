@@ -267,3 +267,27 @@ def process_video_playlist(playlist_url):
     print(f"Zipped {len(video_files)} videos into {zip_filename}")
 
     return zip_filename
+
+def video_pipeline(url):
+    """
+    Determines if the provided URL is a video or a playlist and processes it accordingly.
+
+    Args:
+        url (str): The URL of the YouTube video or playlist to process.
+
+    Returns:
+        str: The path to the zip file containing the downloaded files.
+    """
+    # Set options for yt-dlp to check if the URL is a playlist or video
+    ydl_opts = {'extract_flat': True}
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(url, download=False)
+
+    # Check if the URL is a playlist
+    if 'entries' in info_dict:  # It's a playlist
+        print(f"Processing playlist: {info_dict.get('title')}")
+        return process_video_playlist(url)  # Process the playlist
+    else:  # It's a single video
+        print(f"Downloading video: {info_dict.get('title')}")
+        return download_video(url)  # Download the single video
