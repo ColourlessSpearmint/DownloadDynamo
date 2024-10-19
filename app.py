@@ -1,11 +1,12 @@
 import gradio as gr
 from downloader import download_audio_and_metadata, add_metadata, process_playlist
+from search import search_videos  # Import the search function
 
 # Gradio interface
 with gr.Blocks() as interface:
     # Create a tabbed interface
     with gr.Tabs():
-        # First Tab: Current interface
+        # First Tab: Download Single
         with gr.Tab("Download Single"):
             youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube link here")
             extract_btn = gr.Button("Extract Audio and Metadata")
@@ -37,13 +38,36 @@ with gr.Blocks() as interface:
                                    inputs=[audio_output, title, artist, album, album_artist, release_year, genre, thumbnail_output], 
                                    outputs=audio_output)
 
-        # Second Tab: Input text and output zip file
+        # Second Tab: Download Playlist
         with gr.Tab("Download Playlist"):
             youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube link here")
             playlist_btn = gr.Button("Download Playlist")
             zip_output = gr.File(label="Playlist", type="filepath")
 
             playlist_btn.click(process_playlist, inputs=youtube_url, outputs=zip_output)
+
+        # Third Tab: Search by Keyword
+        with gr.Tab("Search Videos"):
+            search_keyword = gr.Textbox(label="Search Keyword", placeholder="Enter keyword to search")
+            search_btn = gr.Button("Search Videos")
+            
+            # Display outputs for the top 5 videos
+            with gr.Row():
+                titles_output = gr.Label(label="Titles")
+                artists_output = gr.Label(label="Artists")
+                release_years_output = gr.Label(label="Release Years")
+
+            # Audio and thumbnails for each video
+            with gr.Row():
+                audio_output_search = gr.Audio(label="Audio Outputs", type="filepath", show_download_button=True)
+                thumbnails_output = gr.Image(label="Thumbnails", type="filepath")
+
+            # Search functionality
+            search_btn.click(
+                search_videos, 
+                inputs=search_keyword, 
+                outputs=[titles_output, artists_output, release_years_output, audio_output_search, thumbnails_output]
+            )
 
 # Launch the interface
 interface.launch(inbrowser=True)
