@@ -59,7 +59,8 @@ def search_videos(keyword):
         audio_paths.append(video['audio_output'])  # Path to the downloaded audio
 
         response = requests.get(video['thumbnail_output'])
-        thumbnail_file = (video['title'])+".jpg"
+        safe_title = "".join(c for c in video['title'] if c.isalnum() or c in (" ", ".", "_")).rstrip()  # Sanitize title
+        thumbnail_file = (safe_title)+".jpg"
 
         if response.status_code == 200:
             img = Image.open(BytesIO(response.content))
