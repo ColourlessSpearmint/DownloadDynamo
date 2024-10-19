@@ -1,11 +1,12 @@
 import gradio as gr
 from downloader import download_audio_and_metadata, add_metadata, process_playlist
+from search import search_videos  # Import the search function
 
 # Gradio interface
 with gr.Blocks() as interface:
     # Create a tabbed interface
     with gr.Tabs():
-        # First Tab: Current interface
+        # First Tab: Download Single
         with gr.Tab("Download Single"):
             youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube link here")
             extract_btn = gr.Button("Extract Audio and Metadata")
@@ -37,13 +38,51 @@ with gr.Blocks() as interface:
                                    inputs=[audio_output, title, artist, album, album_artist, release_year, genre, thumbnail_output], 
                                    outputs=audio_output)
 
-        # Second Tab: Input text and output zip file
+        # Second Tab: Download Playlist
         with gr.Tab("Download Playlist"):
             youtube_url = gr.Textbox(label="YouTube URL", placeholder="Enter YouTube link here")
             playlist_btn = gr.Button("Download Playlist")
             zip_output = gr.File(label="Playlist", type="filepath")
 
             playlist_btn.click(process_playlist, inputs=youtube_url, outputs=zip_output)
+
+        # Third Tab: Search by Keyword
+        with gr.Tab("Search Videos"):
+            search_keyword = gr.Textbox(label="Search Keyword", placeholder="Enter keyword to search")
+            search_btn = gr.Button("Search Videos")
+            
+            # Display outputs for the top 3 videos, each in its own row
+            def create_video_row(index):
+                with gr.Row():
+                    # Create a row for each video
+                    title_output = gr.Textbox(label=f"Title {index + 1}")
+                    artist_output = gr.Textbox(label=f"Artist {index + 1}")
+                    release_year_output = gr.Textbox(label=f"Release Year {index + 1}")
+                    audio_output = gr.Audio(label=f"Audio {index + 1}", type="filepath", show_download_button=True)
+                    thumbnail_output = gr.Image(label=f"Thumbnail {index + 1}", type="filepath")
+                    url_output = gr.Textbox(label=f"URL {index + 1}", interactive=False)  # URL output, non-interactive
+                    
+                    return title_output, artist_output, release_year_output, audio_output, thumbnail_output, url_output
+
+            # Create placeholders for video outputs
+            video_outputs = [create_video_row(i) for i in range(3)]
+            titles_output = [output[0] for output in video_outputs]
+            artists_output = [output[1] for output in video_outputs]
+            release_years_output = [output[2] for output in video_outputs]
+            audio_output_search = [output[3] for output in video_outputs]
+            thumbnails_output = [output[4] for output in video_outputs]
+            urls_output = [output[5] for output in video_outputs]  # URL outputs
+
+            # Search functionality
+            def update_outputs(keyword):
+                titles, artists, release_years, audio_paths, thumbnails, urls = search_videos(keyword)
+                return (*titles, *artists, *release_years, *audio_paths, *thumbnails, *urls)  # Return URLs as well
+
+            search_btn.click(
+                update_outputs, 
+                inputs=search_keyword, 
+                outputs=[*titles_output, *artists_output, *release_years_output, *audio_output_search, *thumbnails_output, *urls_output]
+            )
 
 # Launch the interface
 interface.launch(inbrowser=True)
