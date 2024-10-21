@@ -12,7 +12,7 @@ Developed by **Ethan Marks** ([@ColourlessSpearmint](https://github.com/Colourle
 - **YouTube Audio Download**: Download audio from YouTube as MP3 using `yt-dlp`.
 - **Automatic Playlist Iteration**: Download an entire playlist with one command.
 - **Keyword Search**: Search YouTube's database without leaving the interface.
-- **MP4 Support**: Save files as .mp4.
+- **MP4 Support**: Save video streams as well as audio.
 - **Automatic Metadata Extraction**: Extract metadata like title, artist, and release year from YouTube videos.
 - **Thumbnail Download**: Download the video thumbnail and use it as album art.
 - **Editable Metadata**: Manually adjust metadata fields such as title, album, artist, and genre.
