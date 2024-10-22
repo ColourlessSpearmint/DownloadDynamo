@@ -15,7 +15,7 @@ def ensure_downloads_directory():
     if not os.path.exists(DOWNLOADS_DIR):
         os.makedirs(DOWNLOADS_DIR)
 
-def download_audio_and_metadata(youtube_url, track_number=None):
+def download_audio_and_metadata(youtube_url, track_number=None, album=None):
     """
     Downloads audio from a YouTube video and applies metadata including title, artist,
     album, and thumbnail as album art.
@@ -23,6 +23,7 @@ def download_audio_and_metadata(youtube_url, track_number=None):
     Args:
         youtube_url (str): The URL of the YouTube video to download audio from.
         track_number (int, optional): The track number for playlist downloads. Defaults to None.
+        album (str, optional): The album name to apply to the audio metadata.
 
     Returns:
         tuple: Contains the path to the downloaded audio file, thumbnail image (if available),
@@ -52,7 +53,8 @@ def download_audio_and_metadata(youtube_url, track_number=None):
         if "music.youtube.com" in youtube_url:
             artist = artist.replace(' - Topic', '')  # Remove ' - Topic' from artist
 
-        album = title  # Set album to the title of the song by default
+        # Use playlist title as album if provided, otherwise default to video title
+        album = album if album else title
         album_artist = artist  # Default album artist to the uploader/artist
         
         # Rename the audio file to the title of the song
@@ -178,12 +180,13 @@ def process_playlist(playlist_url):
         playlist_info = ydl.extract_info(playlist_url, download=False)
         video_urls = [entry['url'] for entry in playlist_info['entries']]
     
+        playlist_title = playlist_info.get('title', 'Unknown Playlist')
     # Store audio files for zipping
     audio_files = []
     
     # Download each video and modify metadata
     for track_number, video_url in enumerate(video_urls, start=1):
-        audio_file, thumbnail_file, _, _, _, _, _, _ = download_audio_and_metadata(video_url, track_number)
+        audio_file, thumbnail_file, _, _, _, _, _, _ = download_audio_and_metadata(video_url, track_number, playlist_title)
         audio_files.append(audio_file)
         if thumbnail_file and os.path.exists(thumbnail_file):
             os.remove(thumbnail_file)  # Remove thumbnail after processing to clean up
@@ -197,6 +200,7 @@ def process_playlist(playlist_url):
     print(f"Zipped {len(audio_files)} audio files into {zip_filename}")
 
     return zip_filename
+
 
 def download_video(youtube_url):
     """
